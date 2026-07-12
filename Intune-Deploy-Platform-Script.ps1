@@ -71,6 +71,7 @@ if ($existing.value.Count -eq 1) {
     catch {
         Write-Error "Failed to update script '$scriptName' (id: $scriptId): $($_.Exception.Message)"
         throw
+    }
 }
 else {
     Write-Output "No existing script found for '$scriptName'. Creating new script..."
