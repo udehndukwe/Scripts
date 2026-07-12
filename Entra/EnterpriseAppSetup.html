@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Enterprise App Setup</title>
+    <style>
+        body { font-family: Segoe UI, sans-serif; line-height: 1.8; color: #333; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin: 30px 0 20px 0; }
+        h2 { color: #34495e; margin: 25px 0 15px 0; border-left: 5px solid #3498db; padding-left: 15px; }
+        h3 { color: #555; margin: 15px 0 10px 0; }
+        code { background: #f0f0f0; padding: 3px 8px; border-radius: 4px; font-family: Courier New; color: #c7254e; }
+        pre { background: #f4f4f4; border: 1px solid #ddd; border-left: 4px solid #3498db; padding: 15px; margin: 15px 0; overflow-x: auto; }
+        ul { margin: 15px 0 15px 40px; }
+        li { margin: 8px 0; }
+        strong { color: #2c3e50; font-weight: 600; }
+        .warning { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 15px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px 15px; text-align: left; }
+        th { background-color: #3498db; color: white; }
+        hr { border: none; border-top: 2px solid #eee; margin: 30px 0; }
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9em; color: #666; }
+        @media print { h1 { page-break-before: avoid; } h2 { page-break-before: avoid; } pre { page-break-inside: avoid; } }
+    </style>
+</head>
+<body># Enterprise App: Intune-Entra-Device-Management
+
+## Successfully Created Resources
+
+### 1. Application Registration
+- <strong>Display Name:</strong> Intune-Entra-Device-Management
+- <strong>Application ID (Client ID):</strong> <code>2ca1cd1c-2709-4f44-97b5-d5de4da70aed</code>
+- <strong>Application Object ID:</strong> <code>ce292370-36e6-4570-9323-034678e4c64b</code>
+- <strong>Tenant:</strong> corpreliablerepairs
+- <strong>Tenant ID:</strong> <code>6d798b83-1769-4a29-9f77-8b9fae1560df</code>
+
+### 2. Service Principal
+- <strong>Service Principal ID:</strong> <code>5b6d93e4-8fa2-4be2-85a1-d714e4b0b36b</code>
+- <strong>Enabled:</strong> Yes
+- <strong>Account Status:</strong> Active
+
+### 3. Client Secret
+- <strong>Secret ID:</strong> <code>0e6ca28d-0d2f-45b8-bbc6-bf8065e4b095</code>
+- <strong>Display Name:</strong> EnterpriseAppSecret-2026
+- <strong>Value:</strong> <code>2ER8Q~KD5a003KRVDu7Wqo3JDF_8PP9GoGnXjbSn</code>
+- <strong>Expires:</strong> 2028-06-26T06:55:30Z
+- <strong>âš ï¸ IMPORTANT:</strong> Save this secret securely - it cannot be retrieved later
+
+### 4. Self-Signed Certificate
+- <strong>Thumbprint:</strong> <code>602B4ADBE69B0D625F93D21ACFA7AFE7F9724324</code>
+- <strong>Subject:</strong> CN=Intune-Entra-Device-Management
+- <strong>Issued:</strong> 2026-06-26
+- <strong>Expires:</strong> 2028-06-26
+- <strong>Files:</strong>
+  - <strong>Private Key & Cert:</strong> <code>C:\Users\udehn\AppData\Local\Temp\IntuneTentureEntraCert.pfx</code>
+  - <strong>Public Cert Only:</strong> <code>C:\Users\udehn\AppData\Local\Temp\IntuneTentureEntraCert.cer</code>
+  - <strong>Password for PFX:</strong> <code>TempPassword123!</code>
+
+## Configured Permissions
+
+The app has been configured to request the following Microsoft Graph permissions:
+- âœ… DeviceManagementManagedDevices.ReadWrite.All (Intune Devices)
+- âœ… Device.ReadWrite.All (Entra Devices)
+- âœ… User.Read.All (Users)
+- âœ… Group.Read.All (Groups)
+
+## Next Steps (Required to Complete Setup)
+
+### Option 1: Complete via Azure Portal (Recommended)
+1. <strong>Upload Certificate:</strong>
+   - Go to Azure Portal â†’ App Registrations â†’ Intune-Entra-Device-Management
+   - Select "Certificates & secrets"
+   - Click "Upload certificate"
+   - Browse to: <code>C:\Users\udehn\AppData\Local\Temp\IntuneTentureEntraCert.cer</code>
+   - Click "Add"
+
+2. <strong>Grant Admin Consent:</strong>
+   - In the same app, go to "API permissions"
+   - Review the requested permissions (already configured)
+   - Click "Grant admin consent for [Tenant]"
+   - Click "Yes" to confirm
+
+### Option 2: Using PowerShell (Admin Rights Required)
+<pre><code># Connect to Microsoft Graph
+Connect-MgGraph -ClientId "2ca1cd1c-2709-4f44-97b5-d5de4da70aed" -TenantId "6d798b83-1769-4a29-9f77-8b9fae1560df" -CertificatePath "C:\Users\udehn\AppData\Local\Temp\IntuneTentureEntraCert.pfx" -CertificatePassword (ConvertTo-SecureString "TempPassword123!" -AsPlainText -Force)
+
+# Use the connection for Graph API calls
+</code></pre>
+## Security Notes
+
+1. <strong>Client Secret:</strong> Store <code>2ER8Q~KD5a003KRVDu7Wqo3JDF_8PP9GoGnXjbSn</code> securely (e.g., Azure Key Vault)
+2. <strong>Certificate Private Key:</strong> The PFX file contains the private key and should be stored securely
+3. <strong>Certificate Password:</strong> Change <code>TempPassword123!</code> in production environments
+4. <strong>Credentials Rotation:</strong> Plan to rotate certificates and secrets periodically
+
+## Certificate Details
+
+The self-signed certificate includes:
+- <strong>Key Usage:</strong> Digital Signature
+- <strong>Extended Key Usage:</strong> Server Authentication, Client Authentication
+- <strong>Public Key Size:</strong> 2048-bit RSA
+- <strong>Signature Algorithm:</strong> sha256RSA
+
+## File Locations
+
+All certificate files are stored in: <code>C:\Users\udehn\AppData\Local\Temp\</code>
+- <code>IntuneTentureEntraCert.pfx</code> - Certificate with private key
+- <code>IntuneTentureEntraCert.cer</code> - Public certificate only
+- <code>cert_base64.txt</code> - Base64 encoded certificate
+
+<strong>Note:</strong> These temp files should be backed up or moved to a permanent secure location.
+
+## To Use This App
+
+### For Client Secret Authentication:
+<pre><code>$credential = New-Object System.Management.Automation.PSCredential(
+    "2ca1cd1c-2709-4f44-97b5-d5de4da70aed",
+    (ConvertTo-SecureString "2ER8Q~KD5a003KRVDu7Wqo3JDF_8PP9GoGnXjbSn" -AsPlainText -Force)
+)
+</code></pre>
+### For Certificate Authentication:
+<pre><code>$cert = Get-ChildItem Cert:\CurrentUser\My | Where-Object { $_.Thumbprint -eq "602B4ADBE69B0D625F93D21ACFA7AFE7F9724324" }
+</code></pre>
+<hr>
+<strong>Created:</strong> 2026-06-26
+<strong>Last Updated:</strong> 2026-06-26
+<footer>
+<p>Document generated on '@ + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + @'
+</p>
+</footer>
+</body>
+</html>

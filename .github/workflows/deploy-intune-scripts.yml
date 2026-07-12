@@ -1,0 +1,75 @@
+name: Deploy Intune PowerShell Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/intune/**'
+  workflow_dispatch:
+    inputs:
+      scriptPath:
+        description: 'Specific script filename to deploy (optional, blank = all)'
+        required: false
+      roleScopeTagIds:
+        description: 'Comma-separated scope tag IDs (optional, default "0")'
+        required: false
+        default: '0'
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Microsoft Graph Authentication module
+        shell: pwsh
+        run: |
+          Install-Module Microsoft.Graph.Authentication -Force -Scope CurrentUser -Repository PSGallery
+
+      - name: Connect to Microsoft Graph
+        shell: pwsh
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          $secureSecret = ConvertTo-SecureString $env:AZURE_CLIENT_SECRET -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential($env:AZURE_CLIENT_ID, $secureSecret)
+          Connect-MgGraph -TenantId $env:AZURE_TENANT_ID -ClientSecretCredential $credential -NoWelcome
+          Write-Output "Connected to tenant: $env:AZURE_TENANT_ID"
+
+      - name: Deploy scripts to Intune
+        shell: pwsh
+        run: |
+          $scopeTagInput = "${{ github.event.inputs.roleScopeTagIds }}"
+          $scopeTags = if ($scopeTagInput) { $scopeTagInput -split ',' } else { @("0") }
+
+          $targetScript = "${{ github.event.inputs.scriptPath }}"
+
+          if ($targetScript) {
+              $scriptFiles = Get-ChildItem -Path "scripts/intune" -Filter $targetScript
+          } else {
+              $scriptFiles = Get-ChildItem -Path "scripts/intune" -Filter "*.ps1"
+          }
+
+          if ($scriptFiles.Count -eq 0) {
+              throw "No matching .ps1 files found in scripts/intune"
+          }
+
+          foreach ($file in $scriptFiles) {
+              Write-Output "----- Deploying: $($file.Name) -----"
+              ./Deploy-IntuneScript.ps1 `
+                  -Path $file.FullName `
+                  -scriptName ($file.BaseName) `
+                  -enforceSigCheck $false `
+                  -runAs32Bit $false `
+                  -runAsAccount "system" `
+                  -description "Deployed via GitHub Actions from $($file.Name) on $(Get-Date -Format 'yyyy-MM-dd')" `
+                  -roleScopeTagIds $scopeTags
+          }
+
+      - name: Disconnect from Microsoft Graph
+        if: always()
+        shell: pwsh
+        run: Disconnect-MgGraph
