@@ -1,5 +1,8 @@
-﻿$DisplayName = "INSERT_DISPLAY_NAME_HERE"
+﻿param(
+    [Parameter(Mandatory)]
+    [string]$DisplayName
 
+    )
 #Create Application
 $app = new-MgApplication -DisplayName $DisplayName
 
