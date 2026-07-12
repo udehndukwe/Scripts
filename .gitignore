@@ -1,0 +1,19 @@
+# VS Code workspace state (yours specifically)
+VSWorkspaceState.json
+IntuneManagement/
+
+# PowerShell / general
+*.log
+*.tmp
+
+# Secrets - never commit these
+*.env
+secrets.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+!.vscode/settings.json
