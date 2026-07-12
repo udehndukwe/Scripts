@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/intune/**'
+      - 'intune-script-deployment/**'
   workflow_dispatch:
     inputs:
       scriptPath:
@@ -48,18 +48,18 @@ jobs:
           $targetScript = "${{ github.event.inputs.scriptPath }}"
 
           if ($targetScript) {
-              $scriptFiles = Get-ChildItem -Path "scripts/intune" -Filter $targetScript
+              $scriptFiles = Get-ChildItem -Path "intune-script-deployment" -Filter $targetScript
           } else {
-              $scriptFiles = Get-ChildItem -Path "scripts/intune" -Filter "*.ps1"
+              $scriptFiles = Get-ChildItem -Path "intune-script-deployment" -Filter "*.ps1"
           }
 
           if ($scriptFiles.Count -eq 0) {
-              throw "No matching .ps1 files found in scripts/intune"
+              throw "No matching .ps1 files found in intune-script-deployment"
           }
 
           foreach ($file in $scriptFiles) {
               Write-Output "----- Deploying: $($file.Name) -----"
-              ./Deploy-IntuneScript.ps1 `
+              ./Intune-Deploy-Platform-Script.ps1 `
                   -Path $file.FullName `
                   -scriptName ($file.BaseName) `
                   -enforceSigCheck $false `
