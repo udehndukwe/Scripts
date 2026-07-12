@@ -36,8 +36,7 @@ jobs:
         run: |
           $secureSecret = ConvertTo-SecureString $env:AZURE_CLIENT_SECRET -AsPlainText -Force
           $credential = New-Object System.Management.Automation.PSCredential($env:AZURE_CLIENT_ID, $secureSecret)
-          Connect-MgGraph -TenantId $env:AZURE_TENANT_ID -ClientSecretCredential $credential -NoWelcome
-          Write-Output "Connected to tenant: $env:AZURE_TENANT_ID"
+          Connect-MgGraph -TenantId $env:AZURE_TENANT_ID -ClientSecretCredential $credential
 
       - name: Deploy scripts to Intune
         shell: pwsh
